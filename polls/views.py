@@ -1,7 +1,9 @@
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
+from django.utils import timezone
 
 from polls.models import Poll, Choice
 
@@ -12,12 +14,18 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published polls."""
-        return Poll.objects.order_by('-pub_date')[:5]
+        return Poll.objects.annotate(count=Count('choice')).filter(pub_date__lte=timezone.now(), count__gt=1).order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
     model = Poll
     template_name = 'polls/detail.html'
+
+    def get_queryset(self):
+        """
+        Excludes any polls that aren't published yet.
+        """
+        return Poll.objects.filter(pub_date__lte=timezone.now())
 
 
 class ResultsView(generic.DetailView):
