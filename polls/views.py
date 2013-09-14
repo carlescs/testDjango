@@ -30,33 +30,41 @@ class DetailView(generic.DetailView):
         return Poll.objects.filter(pub_date__lte=timezone.now())
 
 
-def results(request, poll_id):
-    p = get_object_or_404(Poll, pk=poll_id)
-    weatherdata = \
-        DataPool(
-            series=
+class ResultsView(generic.DetailView):
+    model = Poll
+    template_name = 'polls/results.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ResultsView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        poll_id = context['poll'].pk
+        p = get_object_or_404(Poll, pk=poll_id)
+        weatherdata = \
+            DataPool(
+                series=
+                [{'options': {
+                    'source': p.choice_set},
+                  'terms': [
+                      'choice_text',
+                      'votes']}
+                ])
+        piechart = Chart(
+            datasource=weatherdata,
+            series_options=
             [{'options': {
-                'source': p.choice_set},
-              'terms': [
-                  'choice_text',
-                  'votes']}
-            ])
-    piechart = Chart(
-        datasource=weatherdata,
-        series_options=
-        [{'options': {
-            'type': 'pie'},
-          'terms': {
-              'choice_text': [
-                  'votes']
-          }}],
-        chart_options=
-        {'title': {
-            'text': p.question},
-         'xAxis': {
-             'title': {
-                 'text': 'Choice'}}})
-    return render(request,'polls/results.html', {'poll': p, 'piechart': piechart})
+                'type': 'pie'},
+              'terms': {
+                  'choice_text': [
+                      'votes']
+              }}],
+            chart_options=
+            {'title': {
+                'text': p.question},
+             'xAxis': {
+                 'title': {
+                     'text': 'Choice'}}})
+        context['piechart'] = piechart
+        return context
 
 
 def vote(request, poll_id):
