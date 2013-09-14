@@ -1,3 +1,4 @@
+from chartit import DataPool, Chart
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponseRedirect
@@ -14,7 +15,8 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published polls."""
-        return Poll.objects.annotate(count=Count('choice')).filter(pub_date__lte=timezone.now(), count__gt=1).order_by('-pub_date')[:5]
+        return Poll.objects.annotate(count=Count('choice')).filter(pub_date__lte=timezone.now(), count__gt=1).order_by(
+            '-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
@@ -28,9 +30,33 @@ class DetailView(generic.DetailView):
         return Poll.objects.filter(pub_date__lte=timezone.now())
 
 
-class ResultsView(generic.DetailView):
-    model = Poll
-    template_name = 'polls/results.html'
+def results(request, poll_id):
+    p = get_object_or_404(Poll, pk=poll_id)
+    weatherdata = \
+        DataPool(
+            series=
+            [{'options': {
+                'source': p.choice_set},
+              'terms': [
+                  'choice_text',
+                  'votes']}
+            ])
+    piechart = Chart(
+        datasource=weatherdata,
+        series_options=
+        [{'options': {
+            'type': 'pie'},
+          'terms': {
+              'choice_text': [
+                  'votes']
+          }}],
+        chart_options=
+        {'title': {
+            'text': p.question},
+         'xAxis': {
+             'title': {
+                 'text': 'Choice'}}})
+    return render(request,'polls/results.html', {'poll': p, 'piechart': piechart})
 
 
 def vote(request, poll_id):
