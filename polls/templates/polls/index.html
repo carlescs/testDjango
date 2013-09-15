@@ -1,4 +1,7 @@
 {% extends "polls/base.html" %}
+{% block extraheader %}
+    <title>Polls</title>
+{% endblock %}
 {% block content %}
     <h1>Polls</h1>
     {% if latest_poll_list %}
