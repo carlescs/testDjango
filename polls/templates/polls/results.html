@@ -10,11 +10,16 @@
     <div id="carousel-example-generic" class="carousel slide">
         <div class="carousel-inner">
             <div class="item">
-                <ul>
-                    {% for choice in poll.choice_set.all %}
-                        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-                    {% endfor %}
-                </ul>
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Choice</th><th>Votes</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for choice in poll.choice_set.all %}
+                            <tr><td>{{ choice.choice_text }}</td><td>{{ choice.votes }} vote{{ choice.votes|pluralize }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             <div id='container' class="item active"> Chart will be rendered here </div>
