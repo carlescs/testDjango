@@ -13,3 +13,8 @@ body {
 .starter-template h1{
     text-align: center;
 }
+
+#carousel-example-generic{
+    height: 500px;
+    padding: 10px 150px;
+}

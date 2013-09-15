@@ -2,17 +2,30 @@
 {% block extraheader %}
     <title>{{ poll.question }}</title>
 {% endblock %}
+{% block menu %}
+    <li><a href="{% url 'polls:detail' poll.id %}">Vote</a></li>
+{% endblock %}
 {% block content %}
     <h1>{{ poll.question }}</h1>
+    <div id="carousel-example-generic" class="carousel slide">
+        <div class="carousel-inner">
+            <div class="item">
+                <ul>
+                    {% for choice in poll.choice_set.all %}
+                        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
 
-    <ul>
-        {% for choice in poll.choice_set.all %}
-            <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-        {% endfor %}
-    </ul>
-
-    <div id='container'> Chart will be rendered here </div>
-
+            <div id='container' class="item active"> Chart will be rendered here </div>
+        </div>
+        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+    </div>
     <a href="{% url 'polls:detail' poll.id %}">Vote again?</a>
 {% endblock %}
 {% block extrascripts %}
