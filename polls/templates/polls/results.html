@@ -1,19 +1,19 @@
-<head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+{% extends "polls/base.html" %}
+{% block content %}
+    <h1>{{ poll.question }}</h1>
+
+    <ul>
+        {% for choice in poll.choice_set.all %}
+            <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+        {% endfor %}
+    </ul>
+
+    <div id='container'> Chart will be rendered here </div>
+
+    <a href="{% url 'polls:detail' poll.id %}">Vote again?</a>
+{% endblock %}
+{% block extrascripts %}
     <script src="http://code.highcharts.com/highcharts.js"></script>
     {% load chartit %}
     {{ piechart|load_charts:"container" }}
-</head>
-<body>
-<h1>{{ poll.question }}</h1>
-
-<ul>
-    {% for choice in poll.choice_set.all %}
-        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-    {% endfor %}
-</ul>
-
-<div id='container'> Chart will be rendered here </div>
-
-<a href="{% url 'polls:detail' poll.id %}">Vote again?</a>
-</body>
+{% endblock %}
